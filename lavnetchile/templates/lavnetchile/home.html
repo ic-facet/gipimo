@@ -1,0 +1,89 @@
+﻿{% extends 'lavnetchile/base.html' %}
+{% load static %}
+
+{% block title %}LAVNet-Cl{% endblock %}
+
+{% block content %}
+<div class="main-container text-center">
+
+  <h2 class="section-title">Bienvenidos al sitio de la estación receptora LAVNet-Cl</h2>
+  <h4 class="mb-4">(Latin America Very Low Frequency Network - Chile)</h4>
+  <h2 class="section-title">Quiénes somos</h2>
+  
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="info-card">
+        <div class="row g-0">
+          <div class="col-md-6">
+            <div class="card-body">
+
+              <div class="text-content">
+                <p class="card-text fw-bold fs-6">Este es uno de los 5 sitios en América Latina de la red LAVNet que realizan sondeo ionosférico en baja frecuencia para estudiar la dinámica de la región D ante eventos perturbativos de origen terrestre y extraterrestre. (36°36'00"S 72°06'00"O).</p>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="col-md-6 d-flex align-items-center justify-content-center">
+            <div class="img-wrapper p-3">
+              <img src="{% static 'lavnetchile/images/cinc.jpg' %}" alt="CINC Logo" class="img-fluid w-50" />
+            </div>
+        </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="info-card">
+        <div class="row g-0 align-items-stretch">
+          <div class="col-md-6">
+            <div class="img-wrapper" style="height: 450px; display: flex; align-items: center; justify-content: center; background: #f5f7ff;">
+              <img src="{% static 'lavnetchile/images/antena2.jpg' %}" alt="Estación receptora VLF" style="max-width: 140%; max-height: 170%; object-fit: contain; padding-top: 10%;" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card-body" style="height: 450px; display: flex; align-items: center;">
+              <h3 class="fw-bold mb-3">Sistema Receptor de VLF</h3>
+              <div class="text-content">
+                <p class="card-text fw-bold fs-6">La estación receptora de VLF/LF tiene la capacidad de recibir ondas electromagnéticas en las bandas de muy baja frecuencia (VLF) y baja frecuencia (LF), provenientes de transmisores ubicados en distintas regiones del mundo. La recepción de estas señales permite el monitoreo remoto de la ionósfera, obteniendo información geofísica a partir de perturbaciones en la propagación, ya sea por fenómenos de origen espacial o terrestre. La ubicación estratégica de la estación en Chillán permite realizar un monitoreo latitudinal de la región D de la ionósfera en Chile, desde dicha ciudad hacia el norte, utilizando señales de transmisores ubicados en Estados Unidos. El sistema instalado es capaz de registrar parámetros como fase y amplitud de múltiples estaciones transmisoras, así como generar espectros de frecuencia con una resolución temporal del orden de un minuto.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="info-card">
+        <div class="row g-0 align-items-stretch">
+          <div class="col-md-6">
+            <div class="card-body" style="height: 450px; display: flex; align-items: center;">
+              <h3 class="fw-bold mb-3">Sistema de Monitoreo de Campo Eléctrico Atmosférico</h3>
+              <div class="text-content">
+                <p class="card-text fw-bold fs-6">El sistema de medición de campo eléctrico se basa en el uso del equipo EFM-100, diseñado para la detección de variaciones del campo eléctrico atmosférico asociadas a fenómenos meteorológicos. Este sistema permite registrar perturbaciones del campo eléctrico en la ciudad de Chillán en un radio aproximado de 30 km, siendo especialmente sensible a la actividad de tormentas eléctricas. A partir de las variaciones medidas, es posible identificar la presencia de descargas atmosféricas y estimar de manera aproximada la distancia radial a los focos de actividad eléctrica.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="img-wrapper" style="height: 450px; overflow: hidden;">
+              <img src="{% static 'lavnetchile/images/antena3.jpg' %}" alt="Detector de campo eléctrico EFM-100" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>const API_BASE = '{{ api_base_url|default:"/api" }}';</script>
+  <script src="{% static 'lavnetchile/js/main.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Acerca de nosotros - LAVNet-Zac-Mx{% endblock %}
+
+{% block content %}
+<div class="main-container text-center">
+    <h2 class="section-title">¿Quiénes somos?</h2>
+    
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="info-card">
+                <div class="row g-0">
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <div class="text-content">
+                                <p class="card-text fw-bold">Somos parte de la Red Latinoamericana de Muy Baja Frecuencia (LAVNet), una iniciativa dedicada al estudio y monitoreo de la ionosfera. Nuestra estación en Zacatecas forma parte de una red más amplia de monitoreo que contribuye a la comprensión de los fenómenos ionosféricos y su impacto en las comunicaciones terrestres.</p>
+                                <p class="card-text fw-bold">La ionosfera, una región de la atmósfera terrestre ionizada, responde constantemente a eventos solares y geomagnéticos. Nuestro trabajo se centra en estudiar estas respuestas y contribuir al conocimiento científico en este campo.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="img-wrapper h-100">
+                            <img src="{% static 'images/doc trabajando.jpeg' %}" alt="Documentación y trabajo" class="img-fluid" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="info-card">
+                <div class="row g-0">
+                    <div class="col-md-6">
+                        <div class="img-wrapper h-100">
+                            <img src="{% static 'images/antena.jpeg' %}" alt="Antena" class="img-fluid" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <div class="text-content">
+                                <p class="card-text fw-bold">Operamos una sofisticada antena receptora que nos permite capturar señales de muy baja frecuencia (VLF) las 24 horas del día. Estos datos son procesados y analizados para comprender mejor el comportamiento de la ionosfera y su influencia en las comunicaciones terrestres.</p>
+                                <p class="card-text fw-bold">Este sitio web proporciona acceso a nuestros datos procesados y herramientas para visualizar y descargar muestras de nuestras mediciones.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="info-card">
+                <div class="row g-0">
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <div class="text-content">
+                                <p class="card-text fw-bold">Nuestro equipo está compuesto por investigadores y técnicos dedicados al estudio de la física espacial y la ionosfera. Trabajamos en colaboración con otras instituciones y redes de monitoreo para contribuir al conocimiento global de estos fenómenos atmosféricos.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="img-wrapper h-100">
+                            <img src="{% static 'images/placax.jpeg' %}" alt="Placa" class="img-fluid" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

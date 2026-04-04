@@ -1,0 +1,105 @@
+{% extends 'lavnetzac/base.html' %}
+{% load static %}
+
+{% block title %}LAVNet-UAZ-Mx{% endblock %}
+
+{% block content %}
+<div class="main-container text-center">
+
+  <h2 class="section-title">Bienvenidos al sitio de la estación receptora LAVNet-UAZ-Mx</h2>
+  <h4 class="mb-4">(Latin America Very Low Frequency Network - Zacatecas, México)</h4>
+  <h2 class="section-title">Quiénes somos</h2>
+  
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="info-card">
+        <div class="row g-0">
+          <div class="col-md-6">
+            <div class="card-body">
+              <div class="text-content text-black">
+                <p class="card-text fw-bold">Este es uno de los 5 sitios en América Latina de la red LAVNet que realizan sondeo ionosférico en baja frecuencia para estudiar la dinámica de la región D ante eventos perturbativos de origen terrestre y extraterrestre.</p>
+                <p class="card-text fw-bold">El personal a cargo de este sitio pertenece a la Sociedad Astronómica de Zacatecas (22°29'00"N 102°46'00"O).</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 d-flex align-items-center justify-content-center">
+            <div class="img-wrapper p-3">
+              <img src="{% static 'lavnetzac/images/logo sociedad adz.jpeg' %}" alt="FACET Logo" class="img-fluid w-50" />
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<h2 class="section-title mt-5">Equipo empleado para el sistema receptor de VLF</h2>
+  
+  <h4 class="mb-4">LAVNet-UAZ-Mx</h4>
+  
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="info-card">
+        <div class="row g-0">
+          <div class="col-md-6">
+            <div class="card-body">
+              <h3 class="fw-bold mb-3">Sistema Receptor de VLF</h3>
+              <div class="text-content text-black">
+                <p class="card-text fw-bold">El receptor de LAVNet-UAZ-Mx se basa en el diseño original de SAVNET, con cambios sustanciales que hacen, a este un sistema receptor de señales en VLF. Básicamente, LAVNet-Zac está formado por una antena de tipo bucle, contiene un preamplificador, y una tarjeta de sonido de alta calidad como digitalizador de la señal. El ancho de banda del sistema es de 40 kHz centrado en 30 kHz.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="img-wrapper h-100">
+              <img src="{% static 'lavnetzac/images/antena22.jpeg' %}" alt="Antena LAVNet-Zac" class="img-fluid" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  
+  <div class="row mb-4">
+    <div class="col-md-4 mb-3">
+      <div class="info-card h-100">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3">Sistema de GPS</h5>
+          <div class="img-wrapper">
+            <img src="{% static 'lavnetzac/images/gps.png' %}" alt="Sistema de GPS" class="img-fluid" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="info-card h-100">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3">Tarjeta de audio</h5>
+          <div class="img-wrapper">
+            <img src="{% static 'lavnetzac/images/tarjeta_audio.png' %}" alt="Tarjeta de audio" class="img-fluid" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="info-card h-100">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3">Preamplificador de bajo ruido</h5>
+          <div class="img-wrapper">
+            <img src="{% static 'lavnetzac/images/preamplificador.png' %}" alt="Preamplificador" class="img-fluid" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>const API_BASE = '{{ api_base_url|default:"/api" }}';</script>
+  <script src="{% static 'lavnetzac/js/main.js' %}"></script>
+{% endblock %}

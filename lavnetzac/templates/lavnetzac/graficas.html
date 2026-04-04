@@ -1,0 +1,421 @@
+{% extends 'lavnetzac/base.html' %}
+{% load static %}
+
+{% block title %}Monitoreo VLF - Estaciones{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'lavnetzac/css/graficas.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Gráficas VLF - Zacatecas</h1>
+    <div class="info">
+        <span id="currentTime"></span> | 
+        <span id="dataWindow">Últimas 24 horas</span>
+    </div>
+
+
+<div class="chart-controls">
+    <label for="estacionSelect">Estación:</label>
+    <select id="estacionSelect">
+        <option value="NAA">NAA - Cutler, Maine (44.65°N, 67.28°W | 24.0 kHz)</option>
+        <option value="NDK">NDK - LaMoure, Dakota Norte (46.37°N, 98.34°W | 25.2 kHz)</option>
+        <option value="NLK">NLK - Jim Creek, Washington (48.20°N, 121.92°W | 24.8 kHz)</option>
+        <option value="NAU">NAU - Aguada, Puerto Rico (18.40°N, 67.18°W | 40.75 kHz)</option>
+        <option value="NPM">NPM - Lualualei, Hawaii (21.42°N, 158.15°W | 21.4 kHz)</option>
+        <option value="NWC">NWC - North West Cape, Australia (21.82°S, 114.17°E | 19.8 kHz)</option>
+    </select>
+    <label for="fechaInicio">Fecha y hora inicio:</label>
+    <input type="datetime-local" id="fechaInicio">
+    <label for="fechaFin">Fecha y hora fin:</label>
+    <input type="datetime-local" id="fechaFin">
+    <button id="btnGraficar">Graficar</button>
+</div>
+<div id="mensaje-error" class="mensaje-error" style="display: none;"></div>
+
+<!-- Gráficas separadas: Amplitud y Fase -->
+<div class="separadas-container">
+    <div class="chart-card chart-card-separada">
+        <div class="chart-header">
+            <div class="chart-title-small">Amplitud</div>
+        </div>
+        <canvas id="chartAmp"></canvas>
+    </div>
+    <div class="chart-card chart-card-separada">
+        <div class="chart-header">
+            <div class="chart-title-small">Fase</div>
+        </div>
+        <canvas id="chartFase"></canvas>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title-small text-center w-100">Corredores VLF - Estación Zacatecas</div>
+            </div>
+            <div class="card-body text-center p-4">
+                <p class="mb-4 text-muted">
+                    A continuación se muestran los corredores de propagación VLF monitoreados desde la estación Zacatecas (22°29'00"N 102°46'00"O).
+                </p>
+                <div class="corredores-img-container" style="max-width: 800px; margin: 0 auto;">
+                    <img src="{% static 'lavnetzac/images/corredores_zac.png' %}" 
+                         alt="Corredores de Zacatecas" 
+                         class="img-fluid rounded shadow-sm" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.1.1/dist/chartjs-plugin-annotation.min.js"></script>
+<script>
+    // Configuración global de Chart.js
+    Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+    Chart.defaults.plugins.legend.display = false;
+
+    // Función para convertir datetime-local a formato ISO UTC
+    function convertirAUTC(fechaLocal) {
+        const fecha = new Date(fechaLocal);
+        return fecha.toISOString();
+    }
+
+    // Función para obtener datos reales de la API
+    async function obtenerDatosReales(fechaInicio, fechaFin, estacion) {
+        try {
+            const formData = new FormData();
+            // Convertir las fechas locales a UTC antes de enviar
+            formData.append('fechainicial', convertirAUTC(fechaInicio));
+            formData.append('fechafinal', convertirAUTC(fechaFin));
+            formData.append('estacion', estacion);
+
+            const response = await fetch('/lavnet-zac/api/radob-data', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Error en la petición');
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error al obtener datos:', error);
+            return null;
+        }
+    }
+
+    // Función para procesar datos de la API
+    function procesarDatosAPI(data) {
+        if (!data || data.length === 0) {
+            return null;
+        }
+
+        const timestamps = [];
+        const amplitudes = [];
+        const fases = [];
+
+        data.forEach(item => {
+            timestamps.push(new Date(item.datetime_utc));
+            amplitudes.push(parseFloat(item.amplitud));
+            fases.push(parseFloat(item.fase));
+        });
+
+        return { timestamps, amplitudes, fases };
+    }
+
+    // Generar zonas de amanecer
+    function generarZonasAmanecer(timestamps) {
+        const zonas = [];
+        timestamps.forEach(ts => {
+            const hora = ts.getHours();
+            if (hora === 6) { // Amanecer aproximado
+                zonas.push({
+                    inicio: new Date(ts.getTime() - 30 * 60000),
+                    fin: new Date(ts.getTime() + 30 * 60000)
+                });
+            }
+        });
+        return zonas;
+    }
+
+    // Crear configuración de gráfica
+    function crearConfiguracion(datos, estacion, zonasAmanecer) {
+        // Plugin para zonas de amanecer
+        const pluginAmanecer = {
+            id: 'amanecerBackground',
+            beforeDatasetsDraw: (chart) => {
+                const { ctx, chartArea, scales } = chart;
+                zonasAmanecer.forEach(zona => {
+                    const xInicio = scales.x.getPixelForValue(zona.inicio);
+                    const xFin = scales.x.getPixelForValue(zona.fin);
+                    ctx.fillStyle = 'rgba(76, 175, 80, 0.15)';
+                    ctx.fillRect(xInicio, chartArea.top, xFin - xInicio, chartArea.bottom - chartArea.top);
+                });
+            }
+        };
+
+        return {
+            type: 'line',
+            data: {
+                labels: datos.timestamps,
+                datasets: [
+                    {
+                        label: 'Amplitud',
+                        data: datos.amplitudes,
+                        borderColor: '#2196F3',
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.3,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Fase',
+                        data: datos.fases,
+                        borderColor: '#F44336',
+                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.3,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'hour',
+                            displayFormats: {
+                                hour: 'HH:mm'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Amplitud',
+                            color: '#2196F3'
+                        },
+                        ticks: {
+                            color: '#2196F3'
+                        },
+                        grid: {
+                            color: 'rgba(33, 150, 243, 0.1)'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Fase',
+                            color: '#F44336'
+                        },
+                        ticks: {
+                            color: '#F44336'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: (context) => {
+                                return moment(context[0].parsed.x).format('HH:mm');
+                            }
+                        }
+                    }
+                }
+            },
+            plugins: [pluginAmanecer]
+        };
+    }
+
+    // Crear configuración para gráfica separada (amplitud o fase)
+    function crearConfigSeparada(datos, estacion, tipo) {
+        const isAmp = tipo === 'amplitud';
+        const dataset = {
+            label: isAmp ? 'Amplitud' : 'Fase',
+            data: isAmp ? datos.amplitudes : datos.fases,
+            borderColor: isAmp ? '#2196F3' : '#F44336',
+            backgroundColor: isAmp ? 'rgba(33, 150, 243, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.3
+        };
+
+        return {
+            type: 'line',
+            data: {
+                labels: datos.timestamps,
+                datasets: [dataset]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2.5,
+                animation: false,
+                interaction: { mode: 'index', intersect: false },
+                scales: {
+                    x: { 
+                        type: 'time', 
+                        time: { unit: 'hour', displayFormats: { hour: 'HH:mm' } },
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    },
+                    y: {
+                        title: { display: true, text: isAmp ? 'Amplitud' : 'Fase', color: isAmp ? '#2196F3' : '#F44336' },
+                        ticks: { color: isAmp ? '#2196F3' : '#F44336' },
+                        grid: { color: isAmp ? 'rgba(33, 150, 243, 0.1)' : 'rgba(244, 67, 54, 0.1)' }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: (context) => {
+                                return moment(context[0].parsed.x).format('HH:mm');
+                            }
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    // Actualizar información en tiempo real
+    function actualizarInfo() {
+        const ahora = new Date();
+        document.getElementById('currentTime').textContent = 
+            ahora.toLocaleString('es-ES', { 
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: 'UTC',
+                timeZoneName: 'short'
+            });
+    }
+
+
+    // Instancias de gráficas
+    let chartAmp = null;
+    let chartFase = null;
+
+    // Función para destruir las gráficas existentes
+    function destruirGrafica() {
+        if (chartAmp) { chartAmp.destroy(); chartAmp = null; }
+        if (chartFase) { chartFase.destroy(); chartFase = null; }
+    }
+
+    // Función para mostrar/ocultar mensaje de error
+    function mostrarMensaje(mensaje, tipo = 'error') {
+        const mensajeDiv = document.getElementById('mensaje-error');
+        mensajeDiv.textContent = mensaje;
+        mensajeDiv.className = tipo === 'error' ? 'mensaje-error' : 'mensaje-info';
+        mensajeDiv.style.display = 'block';
+    }
+
+    function ocultarMensaje() {
+        const mensajeDiv = document.getElementById('mensaje-error');
+        mensajeDiv.style.display = 'none';
+    }
+
+    // Función para actualizar las gráficas separadas
+    async function actualizarGraficaEstacion() {
+        const estacion = document.getElementById('estacionSelect').value;
+        const fechaInicio = document.getElementById('fechaInicio').value;
+        const fechaFin = document.getElementById('fechaFin').value;
+
+        if (!fechaInicio || !fechaFin) return;
+
+        ocultarMensaje();
+
+        // Obtener datos reales de la API
+        const datosAPI = await obtenerDatosReales(fechaInicio, fechaFin, estacion);
+        
+        if (!datosAPI) {
+            mostrarMensaje('Error al obtener datos del servidor');
+            return;
+        }
+
+        const datos = procesarDatosAPI(datosAPI);
+        
+        if (!datos) {
+            mostrarMensaje('Lo sentimos, no hay datos en ese rango de fechas.');
+            destruirGrafica();
+            return;
+        }
+
+        destruirGrafica();
+
+        // Gráfica amplitud (separada)
+        const canvasAmp = document.getElementById('chartAmp');
+        if (canvasAmp) {
+            const ctxAmp = canvasAmp.getContext('2d');
+            chartAmp = new Chart(ctxAmp, crearConfigSeparada(
+                datos, estacion, 'amplitud'
+            ));
+        }
+
+        // Gráfica fase (separada)
+        const canvasFase = document.getElementById('chartFase');
+        if (canvasFase) {
+            const ctxFase = canvasFase.getContext('2d');
+            chartFase = new Chart(ctxFase, crearConfigSeparada(
+                datos, estacion, 'fase'
+            ));
+        }
+    }
+
+    // Inicializar controles y gráfica cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', () => {
+        actualizarInfo();
+
+        // Setear valores por defecto para los selectores de fecha/hora (solo 2 de octubre 2025)
+        document.getElementById('fechaInicio').value = '2025-10-02T00:00';
+        document.getElementById('fechaFin').value = '2025-10-02T23:59';
+
+        // Cargar datos automáticamente al entrar a la página
+        actualizarGraficaEstacion();
+
+        // Listeners para actualizar la gráfica
+        document.getElementById('btnGraficar').addEventListener('click', actualizarGraficaEstacion);
+
+        // Actualizar el reloj cada segundo
+        setInterval(actualizarInfo, 1000);
+    });
+
+    // Limpiar recursos cuando la página se descarga
+    window.addEventListener('beforeunload', () => {
+        destruirGrafica();
+    });
+</script>
+{% endblock %}

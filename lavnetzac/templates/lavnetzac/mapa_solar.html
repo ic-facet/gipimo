@@ -1,0 +1,121 @@
+{% extends 'lavnetzac/base.html' %}
+{% load static %}
+
+{% block title %}Mapa Solar - LAVNet-UAZ-Mx{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'lavnetzac/css/mapa_solar.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="solar-container">
+    <div class="header-solar">
+        <h1>MAPA SOLAR EN TIEMPO REAL</h1>
+        <div class="info-solar">
+            <div class="info-item">
+                <span class="label">UTC:</span>
+                <span id="timeUTC"></span>
+            </div>
+            <div class="info-item">
+                <span class="label">Local (UTC-6):</span>
+                <span id="timeLocal"></span>
+            </div>
+            <div class="info-item">
+                <span class="label">Posición del Sol:</span>
+                <span id="sunPosition"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-solar">
+        <button id="btnRewind" class="btn-control" title="Retroceder 1 hora">
+            <span>⏪</span> -1h
+        </button>
+        <button id="btnBackward" class="btn-control" title="Retroceder 15 minutos">
+            <span>◀</span> -15m
+        </button>
+        <button id="btnRealTime" class="btn-control btn-realtime" title="Volver a tiempo real">
+            <span>🔄</span> Tiempo Real
+        </button>
+        <button id="btnForward" class="btn-control" title="Adelantar 15 minutos">
+            <span>▶</span> +15m
+        </button>
+        <button id="btnFastForward" class="btn-control" title="Adelantar 1 hora">
+            <span>⏩</span> +1h
+        </button>
+        <button id="btnToggleAnimation" class="btn-control btn-animation" title="Activar animación automática">
+            <span>▶️</span> Animar
+        </button>
+    </div>
+
+    <div class="map-container">
+        <canvas id="solarMap"></canvas>
+        <div class="legend-solar">
+            <div class="legend-item">
+                <div class="legend-icon" style="background: #1a237e;"></div>
+                <span>Noche</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon" style="background: #4a5f8f;"></div>
+                <span>Crepúsculo</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon" style="background: #f0f0f0;"></div>
+                <span>Día</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon station-tx"></div>
+                <span>Estaciones TX (Transmisoras)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon station-rx"></div>
+                <span>Receptor (Zacatecas)</span>
+            </div>
+
+            <div class="legend-group text-white">
+                <div style="width: 30px; border-bottom: 3px dashed #ff4500; margin-right: 10px; height: 10px;"></div>
+                <span>límites de placas</span>
+            </div>
+
+            <div class="legend-item">
+                <span style="color: #ff3300; font-size: 1.2em; font-weight: bold;">▲</span>
+                <span>Volcán</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stations-info">
+        <h3>Estaciones VLF Monitoreadas</h3>
+        <div class="stations-grid">
+            <div class="station-card">
+                <strong>NAA</strong> - Cutler, Maine<br>
+                <small>44.65°N, 67.28°W | 24.0 kHz</small>
+            </div>
+            <div class="station-card">
+                <strong>NDK</strong> - LaMoure, Dakota Norte<br>
+                <small>46.37°N, 98.34°W | 25.2 kHz</small>
+            </div>
+            <div class="station-card">
+                <strong>NLK</strong> - Jim Creek, Washington<br>
+                <small>48.20°N, 121.92°W | 24.8 kHz</small>
+            </div>
+            <div class="station-card">
+                <strong>NAU</strong> - Aguada, Puerto Rico<br>
+                <small>18.40°N, 67.18°W | 40.75 kHz</small>
+            </div>
+            <div class="station-card">
+                <strong>NPM</strong> - Lualualei, Hawaii<br>
+                <small>21.42°N, 158.15°W | 21.4 kHz</small>
+            </div>
+            <div class="station-card">
+                <strong>NWC</strong> - North West Cape, Australia<br>
+                <small>21.82°S, 114.17°E | 19.8 kHz</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'lavnetzac/js/mapa_solar.js' %}"></script>
+{% endblock %}

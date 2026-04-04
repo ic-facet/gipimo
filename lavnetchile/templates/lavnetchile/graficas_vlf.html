@@ -1,0 +1,98 @@
+{% extends 'lavnetchile/base.html' %}
+{% load static %}
+
+{% block title %}Monitoreo VLF - Estaciones{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'lavnetchile/css/graficas.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="header text-center mt-4">
+    <h1>Gráficas VLF - Chile</h1>
+    <div class="info">
+        <span id="currentTime"></span> | 
+        <span id="dataWindow">Últimas 24 horas</span>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-11">
+            <div class="chart-controls p-3 border rounded bg-light d-flex align-items-center justify-content-between flex-wrap">
+                <div class="m-1">
+                    <label class="fw-bold">Estación:</label>
+                    <select id="estacionSelect" class="form-select d-inline-block w-auto ms-1">
+                        <option value="CHL_TEST">Chile - Estación Experimental</option>
+                    </select>
+                </div>
+                <div class="m-1">
+                    <label class="fw-bold">Inicio:</label>
+                    <input type="datetime-local" id="fechaInicio" class="form-control d-inline-block w-auto">
+                </div>
+                <div class="m-1">
+                    <label class="fw-bold">Fin:</label>
+                    <input type="datetime-local" id="fechaFin" class="form-control d-inline-block w-auto">
+                </div>
+                <button id="btnGraficar" class="btn btn-primary m-1">Graficar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div class="chart-card shadow-sm p-4 bg-white rounded">
+                <div class="chart-header mb-3 border-bottom pb-2">
+                    <h5 class="fw-bold text-primary">Medición VLF (EN DESARROLLO)</h5>
+                </div>
+                <div style="height: 450px; width: 100%;">
+                    <canvas id="chartAmp"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.1"></script>
+
+<script>
+    // Lógica representativa (Placeholder)
+    function actualizarReloj() {
+        const ahora = new Date();
+        document.getElementById('currentTime').textContent = ahora.toUTCString();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        actualizarReloj();
+        setInterval(actualizarReloj, 1000);
+
+        // Inicializar gráfica vacía/representativa
+        const ctx = document.getElementById('chartAmp').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [moment().subtract(2, 'hours'), moment().subtract(1, 'hours'), moment()],
+                datasets: [{
+                    label: 'Datos en desarrollo',
+                    data: [0.5, 0.8, 0.4],
+                    borderColor: '#2196F3',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { type: 'time', time: { unit: 'hour' } }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

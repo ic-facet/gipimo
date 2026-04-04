@@ -1,0 +1,61 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}LAVNet-CDM-Mx{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'lavnetunam/css/style.css' %}">
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container">
+        <a class="navbar-brand" href="{% url 'lavnetunam:home' %}">
+          <img src="{% static 'lavnetunam/images/logo_UNAM_geofisica.png' %}" alt="Logo" height="40" class="d-inline-block align-text-top me-2">
+          LAVNet-CDM-Mx
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMain">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'lavnetunam:home' %}">Inicio</a>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Gráficas
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li>
+                  <a class="dropdown-item" href="{% url 'lavnetunam:graficas' %}">Sistema Receptor VLF</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'lavnetunam:callisto_mexico' %}">Callisto</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'lavnetunam:mapa_solar' %}">Mapa Solar</a>
+            </li>
+
+            <li class="nav-item ms-2">
+              <img src="{% static 'lavnetunam/images/logo_unam.jpg' %}" alt="Logo Sociedad ADZ" height="40" class="d-inline-block align-text-top">
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container mt-4">
+      {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
