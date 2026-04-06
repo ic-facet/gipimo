@@ -10,6 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import sys
+import dj_database_url
+
 from pathlib import Path
 import os
 from dotenv import load_dotenv
@@ -32,6 +35,7 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'gipimo.ddns.net,localhost,127.0.0.1').split(',')
 
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:8000,http://127.0.0.1:8000").split(",")
 
 # Application definition
 
@@ -84,11 +88,13 @@ WSGI_APPLICATION = 'lavnet_site.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.config(
+        default=os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR}/db.sqlite3"),
+        conn_max_age=600,
+        ssl_require=False,
+    ),
 }
+
 
 
 # Password validation
@@ -113,13 +119,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "es-ar"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "America/Argentina/Buenos_Aires"
 
 USE_I18N = True
 
-USE_TZ = True
+USE_L10N = True
+
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -130,8 +138,6 @@ STATIC_URL = '/static/'
 # Carpeta destino para `collectstatic` en despliegue
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-LANGUAGE_CODE = 'es-mx'
-TIME_ZONE = 'America/Mexico_City'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -140,3 +146,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # WhiteNoise configuration for serving static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "stream": sys.stdout,
+        }
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+}
