@@ -1,0 +1,12 @@
+providers = ["python"]
+
+[variables]
+NIXPACKS_PYTHON_VERSION = "3.12"
+
+[phases.build]
+cmds = [
+  "python manage.py collectstatic --noinput",
+]
+
+[start]
+cmd = "python manage.py migrate --noinput && gunicorn lavnet_site.wsgi:application --bind 0.0.0.0:8000 --workers 3 --access-logfile - --error-logfile -"
